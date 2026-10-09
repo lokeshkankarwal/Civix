@@ -16,6 +16,7 @@ import {
 } from "react-icons/fa";
 import Navbar from "../Navbar/Navbar";
 import StatusBadge from "../common/StatusBadge";
+import ProgressStepper from "../common/ProgressStepper";
 import "./IssueDetails.css";
 
 const IssueDetails = () => {
@@ -209,6 +210,7 @@ const IssueDetails = () => {
             )}
           </div>
           <p className="issue-description">{issue.description}</p>
+          <ProgressStepper status={issue.status} />
           <div className="issue-meta-row">
             <span className="meta-item">
               <FaMapMarkerAlt /> {issue.location?.address}

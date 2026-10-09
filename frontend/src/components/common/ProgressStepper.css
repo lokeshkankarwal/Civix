@@ -1,0 +1,150 @@
+.stepper-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.stepper-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.stepper-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.stepper-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 99px;
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.stepper-badge.solved,
+.stepper-badge.resolved {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.stepper-badge.in_progress {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.stepper-track {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+}
+
+.stepper-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  flex: 1;
+}
+
+.step-indicator {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  color: #64748b;
+  z-index: 2;
+  transition: all 0.25s ease;
+}
+
+.step-done .step-indicator {
+  background: #10b981;
+  border-color: #10b981;
+  color: #ffffff;
+}
+
+.step-current .step-indicator {
+  background: #0084ff;
+  border-color: #0084ff;
+  color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(0, 132, 255, 0.2);
+}
+
+.step-current-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffffff;
+  animation: stepper-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes stepper-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+.step-content {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.step-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.step-current .step-label {
+  color: #0084ff;
+}
+
+.step-desc {
+  font-size: 0.7rem;
+  color: #64748b;
+  max-width: 110px;
+}
+
+.step-connector {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: #e2e8f0;
+  z-index: 1;
+}
+
+.connector-done {
+  background: #10b981;
+}
+
+@media (max-width: 640px) {
+  .stepper-card {
+    padding: 1rem;
+  }
+  .step-desc {
+    display: none;
+  }
+  .step-label {
+    font-size: 0.75rem;
+  }
+}
