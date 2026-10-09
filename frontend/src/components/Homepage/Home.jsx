@@ -10,6 +10,9 @@ import {
 } from "react-icons/fa";
 import Navbar from "../Navbar/Navbar";
 import { statesAndDistricts } from "../../utils/statesAndDistricts";
+import StatusBadge from "../common/StatusBadge";
+import IssueCardSkeleton from "../common/IssueCardSkeleton";
+import { normalizeStatus } from "../../utils/formatters";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -152,16 +155,8 @@ const Home = () => {
       <Navbar />
 
       <div className="home-container">
-        {/* Loading State */}
-        {loading && (
-          <div className="loading-container">
-            <div className="spinner"></div>
-            <p>Loading community issues...</p>
-          </div>
-        )}
-
         {/* Error State */}
-        {!loading && error && (
+        {error && (
           <div className="error-container">
             <p>Error: {error}</p>
             <button
@@ -173,16 +168,14 @@ const Home = () => {
           </div>
         )}
 
-        {/* Main Content (Only shown when not loading & no error) */}
-        {!loading && !error && (
-          <section className="content">
-            {/* Hero Section */}
-            <div className="hero-section">
-              <div className="hero-text">
-                <h3>Civic Issues</h3>
-                <p>Report and track community problems in your area</p>
-              </div>
+        <section className="content">
+          {/* Hero Section */}
+          <div className="hero-section">
+            <div className="hero-text">
+              <h3>Civic Issues</h3>
+              <p>Report and track community problems in your area</p>
             </div>
+          </div>
 
             {/* Location Search */}
             <div className="filters-bar">
@@ -232,8 +225,11 @@ const Home = () => {
             </div>
 
             {/* Issues Grid */}
-            <div className="civix-card-layout">
-              {filteredIssues.length > 0 ? (
+            {loading ? (
+              <IssueCardSkeleton count={8} />
+            ) : (
+              <div className="civix-card-layout">
+                {filteredIssues.length > 0 ? (
                 filteredIssues.map((issue) => (
                   <div
                     key={issue._id}
@@ -265,13 +261,13 @@ const Home = () => {
                         <span>Image unavailable</span>
                       </div>
 
-                      <span
-                        className={`civix-badge ${issue.status
-                          ?.toLowerCase()
-                          .replace(" ", "_")}`}
-                      >
-                        {issue.status}
-                      </span>
+                      <div className="civix-badge-container">
+                        <StatusBadge
+                          status={issue.status}
+                          size="sm"
+                          pulse={normalizeStatus(issue.status) === "in_progress"}
+                        />
+                      </div>
                     </div>
 
                     <div className="civix-card-body">
@@ -327,6 +323,7 @@ const Home = () => {
                 </div>
               )}
             </div>
+          )}
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
@@ -363,7 +360,6 @@ const Home = () => {
               </div>
             )}
           </section>
-        )}
       </div>
     </div>
   );

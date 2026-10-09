@@ -234,6 +234,13 @@ body {
 .civix-card-media .civix-media-fallback { display: none; position: absolute; top: 0; left: 0; background: #f8fafc; }
 .civix-card-media.has-error .civix-media-fallback { display: flex; }
 
+.civix-badge-container {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+}
+
 /* Status Badges */
 .civix-badge {
   position: absolute;
