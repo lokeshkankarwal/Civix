@@ -143,9 +143,149 @@
   transform: translateY(0);
 }
 
-/* Optional: Add a red dot to notification if needed later */
+/* Notification unread indicator */
 .notification-button {
   position: relative;
+}
+
+.notification-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 9px;
+  height: 9px;
+  background-color: #ef4444;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  animation: badge-pulse 1.8s infinite;
+}
+
+/* Profile Dropdown */
+.profile-dropdown-wrapper {
+  position: relative;
+}
+
+.profile-button.active {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.profile-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 220px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  padding: 0.5rem;
+  z-index: 1100;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.dropdown-user-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.5rem 0.6rem;
+}
+
+.user-avatar-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0084ff 0%, #3b82f6 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.user-text-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-role-chip {
+  font-size: 0.7rem;
+  color: #64748b;
+  text-transform: capitalize;
+  font-weight: 500;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 0.35rem 0;
+}
+
+.dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.55rem 0.75rem;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  color: #334155;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background: #f1f5f9;
+  color: var(--text-primary);
+}
+
+.dropdown-item.logout {
+  color: #ef4444;
+}
+
+.dropdown-item.logout:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Mobile Hamburger Button */
+.mobile-hamburger-btn {
+  display: none;
+  background: none;
+  border: 1px solid var(--border-color);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.mobile-logout-btn {
+  color: #ef4444 !important;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 /* --- Responsive Design --- */
@@ -154,55 +294,48 @@
     padding: 0 1rem;
   }
 
-  /* Hide text labels on tablet/mobile to save space */
-  .nav-link span,
-  .nav-link {
-    /* If the text is directly inside, we might need to target the text node. 
-       Since React code has <FaIcon /> Text, we hide the text by font-size 0 
-       or simpler: just hide the text label logic if possible. 
-       Here is a CSS trick to hide text but keep icon: */
-    font-size: 0; 
-    padding: 0.75rem; /* Make it square-ish */
-    gap: 0;
+  .mobile-hamburger-btn {
+    display: flex;
   }
 
-  /* Reset font size for the icon itself */
-  .nav-link svg {
-    font-size: 1.25rem;
-  }
-  
-  /* Adjust Brand Size */
-  .navbar-brand {
-    font-size: 1.25rem;
-  }
-
+  /* Mobile Drawer Menu */
   .nav-links {
-    gap: 0.25rem;
+    display: none;
+    position: absolute;
+    top: 70px;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+    flex-direction: column;
+    padding: 1rem;
+    gap: 0.5rem;
   }
-  
+
+  .nav-links.mobile-open {
+    display: flex;
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  .nav-link {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+  }
+
+  .nav-link span {
+    display: inline !important;
+  }
+
   .user-profile {
     gap: 0.5rem;
   }
-  
+
   .notification-button,
   .profile-button {
     width: 36px;
     height: 36px;
-  }
-}
-
-@media (max-width: 480px) {
-  /* On very small screens, reduce brand visibility or spacing further if needed */
-  .navbar-brand span {
-    display: none; /* If brand had a span. Currently it's text node. */
-  }
-  
-  /* Alternatively, hide brand text visually but keep the icon/before element */
-  .navbar-brand {
-    font-size: 0; 
-  }
-  .navbar-brand::before {
-    width: 20px;
-    height: 20px;
   }
 }
