@@ -188,6 +188,14 @@ const Home = () => {
     return counts;
   }, [filteredIssues]);
 
+  const impactStats = useMemo(() => {
+    const total = filteredIssues.length;
+    const resolved = statusCounts.solved;
+    const inProgress = statusCounts.in_progress;
+    const rate = total > 0 ? Math.round((resolved / total) * 100) : 0;
+    return { total, resolved, inProgress, rate };
+  }, [filteredIssues.length, statusCounts]);
+
   const displayedIssues = useMemo(() => {
     let result = filteredIssues;
 
@@ -322,6 +330,47 @@ const Home = () => {
             <div className="hero-text">
               <h3>Civic Issues</h3>
               <p>Report and track community problems in your area</p>
+            </div>
+
+            {/* Interactive Impact Metrics */}
+            <div className="hero-impact-grid">
+              <button
+                type="button"
+                className={`impact-card ${statusFilter === "all" ? "active" : ""}`}
+                onClick={() => setStatusFilter("all")}
+                title="Filter by all issues"
+                data-testid="impact-card-all"
+              >
+                <span className="impact-num">{impactStats.total}</span>
+                <span className="impact-label">Total Reported</span>
+              </button>
+
+              <button
+                type="button"
+                className={`impact-card ${statusFilter === "solved" ? "active" : ""}`}
+                onClick={() => setStatusFilter("solved")}
+                title="Filter by solved issues"
+                data-testid="impact-card-solved"
+              >
+                <span className="impact-num solved">{impactStats.resolved}</span>
+                <span className="impact-label">Resolved Issues</span>
+              </button>
+
+              <button
+                type="button"
+                className={`impact-card ${statusFilter === "in_progress" ? "active" : ""}`}
+                onClick={() => setStatusFilter("in_progress")}
+                title="Filter by in-progress issues"
+                data-testid="impact-card-progress"
+              >
+                <span className="impact-num in-progress">{impactStats.inProgress}</span>
+                <span className="impact-label">In Progress</span>
+              </button>
+
+              <div className="impact-card rate-card">
+                <span className="impact-num rate">{impactStats.rate}%</span>
+                <span className="impact-label">Resolution Rate</span>
+              </div>
             </div>
           </div>
 

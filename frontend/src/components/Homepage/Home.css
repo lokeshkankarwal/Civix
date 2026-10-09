@@ -108,6 +108,90 @@ body {
   opacity: 0.9;
 }
 
+.hero-impact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin-top: 1.75rem;
+}
+
+.impact-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.impact-card:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.impact-card.active {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: #ffffff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.impact-card.active .impact-num,
+.impact-card.active .impact-label {
+  color: #0f172a;
+}
+
+.impact-card.rate-card {
+  cursor: default;
+}
+
+.impact-card.rate-card:hover {
+  transform: none;
+}
+
+.impact-num {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.impact-num.solved {
+  color: #a7f3d0;
+}
+
+.impact-card.active .impact-num.solved {
+  color: #059669;
+}
+
+.impact-num.in-progress {
+  color: #fde68a;
+}
+
+.impact-card.active .impact-num.in-progress {
+  color: #d97706;
+}
+
+.impact-num.rate {
+  color: #e0e7ff;
+}
+
+.impact-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  opacity: 0.88;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 /* --- Filters Bar --- */
 .filters-bar {
   display: flex;
