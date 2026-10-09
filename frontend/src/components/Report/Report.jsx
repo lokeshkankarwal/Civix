@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
-import { FaMapMarkerAlt } from "react-icons/fa";
+import { FaMapMarkerAlt, FaCloudUploadAlt, FaTimes, FaExclamationTriangle } from "react-icons/fa";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "./Report.css";
@@ -73,6 +73,7 @@ const Report = () => {
     title: "",
     description: "",
     department:"",
+    urgency: "Medium",
     images: [],
     coordinates: [],
     address: "",
@@ -84,6 +85,14 @@ const Report = () => {
   const [imageFiles, setImageFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const handleRemoveImage = (indexToRemove) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, idx) => idx !== indexToRemove),
+    }));
+    setImageFiles((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  };
   const [showMap, setShowMap] = useState(false);
   const [defaultLocation, setDefaultLocation] = useState(null);
   const [mapCenter, setMapCenter] = useState([18.5204, 73.8567]); // Pune default
@@ -234,17 +243,49 @@ const handleSubmit = async (e) => {
               </div>
 
               <div className="report-input-group">
-                <label htmlFor="description">Description *</label>
+                <div className="description-header-row">
+                  <label htmlFor="description">Description *</label>
+                  <span className={`char-counter ${formData.description.length > 550 ? "near-limit" : ""}`}>
+                    {formData.description.length} / 600 characters
+                  </span>
+                </div>
                 <textarea
                   id="description"
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  placeholder="Provide detailed information about the issue"
+                  placeholder="Provide detailed information about the issue (e.g. landmarks, hazards, when it started)..."
                   rows="4"
+                  maxLength={600}
                   required
                 />
               </div>
+
+              {/* Urgency Selector */}
+              <div className="report-input-group">
+                <label>Priority / Urgency Level</label>
+                <div className="urgency-chips-group">
+                  {[
+                    { level: "Low", desc: "Minor inconvenience" },
+                    { level: "Medium", desc: "Standard civic issue" },
+                    { level: "High", desc: "Significant disruption" },
+                    { level: "Urgent", desc: "Public hazard / danger" },
+                  ].map((u) => (
+                    <button
+                      key={u.level}
+                      type="button"
+                      className={`urgency-chip-btn urgency-${u.level.toLowerCase()} ${
+                        formData.urgency === u.level ? "active" : ""
+                      }`}
+                      onClick={() => setFormData((prev) => ({ ...prev, urgency: u.level }))}
+                    >
+                      <span className="urgency-name">{u.level}</span>
+                      <span className="urgency-desc">{u.desc}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="report-input-group">
                 <label htmlFor="department">Department *</label>
                 <select
@@ -349,29 +390,49 @@ const handleSubmit = async (e) => {
               </div>
 
               <div className="report-input-group">
-                <label htmlFor="images">Images</label>
-                <input
-                  type="file"
-                  id="images"
-                  name="images"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageUpload}
-                  className="report-file-input"
-                />
-                <small className="report-helper-text">
-                  You can upload multiple images (optional)
-                </small>
-                <div className="report-image-preview">
-                  {formData.images?.map((img, idx) => (
-                    <img
-                      key={idx}
-                      src={img}
-                      alt={`preview-${idx}`}
-                      className="report-preview-image"
-                    />
-                  ))}
+                <label>Evidence Photos</label>
+                <div
+                  className="interactive-dropzone"
+                  onClick={() => document.getElementById("images").click()}
+                  data-testid="images-dropzone"
+                >
+                  <FaCloudUploadAlt className="dropzone-icon" />
+                  <p className="dropzone-title">Click to browse or drop photos here</p>
+                  <span className="dropzone-sub">Upload up to 5 photos for verification (PNG, JPG, WEBP)</span>
+                  <input
+                    type="file"
+                    id="images"
+                    name="images"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageUpload}
+                    className="report-file-input"
+                    style={{ display: "none" }}
+                  />
                 </div>
+
+                {formData.images && formData.images.length > 0 && (
+                  <div className="report-image-preview-grid">
+                    {formData.images.map((img, idx) => (
+                      <div key={idx} className="preview-card-item">
+                        <img
+                          src={img}
+                          alt={`preview-${idx}`}
+                          className="report-preview-thumb"
+                        />
+                        <button
+                          type="button"
+                          className="remove-preview-btn"
+                          onClick={() => handleRemoveImage(idx)}
+                          title="Remove image"
+                        >
+                          <FaTimes />
+                        </button>
+                        <span className="preview-index-tag">#{idx + 1}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
