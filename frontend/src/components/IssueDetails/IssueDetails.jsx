@@ -13,6 +13,12 @@ import {
   FaChevronRight,
   FaTimes,
   FaSearchPlus,
+  FaShareAlt,
+  FaWhatsapp,
+  FaTwitter,
+  FaEnvelope,
+  FaCopy,
+  FaCheck,
 } from "react-icons/fa";
 import Navbar from "../Navbar/Navbar";
 import StatusBadge from "../common/StatusBadge";
@@ -28,8 +34,25 @@ const IssueDetails = () => {
   const [hasUpvoted, setHasUpvoted] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isLinkCopied, setIsLinkCopied] = useState(false);
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
   const userId = currentUser?._id;
+
+  const handleCopyShareLink = () => {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        setIsLinkCopied(true);
+        setTimeout(() => setIsLinkCopied(false), 2000);
+      }).catch(() => {
+        setIsLinkCopied(true);
+        setTimeout(() => setIsLinkCopied(false), 2000);
+      });
+    } else {
+      setIsLinkCopied(true);
+      setTimeout(() => setIsLinkCopied(false), 2000);
+    }
+  };
 
   useEffect(() => {
     const fetchIssue = async () => {
@@ -270,6 +293,15 @@ const IssueDetails = () => {
               <span>
                 <FaCommentDots /> {issue.comments?.length || 0}
               </span>
+              <button
+                type="button"
+                className="share-trigger-btn"
+                onClick={() => setIsShareModalOpen(true)}
+                title="Share this civic issue"
+                data-testid="share-modal-trigger"
+              >
+                <FaShareAlt /> Share
+              </button>
             </div>
           </div>
         </div>
@@ -404,6 +436,94 @@ const IssueDetails = () => {
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Interactive Share Modal */}
+      {isShareModalOpen && (
+        <div
+          className="share-modal-overlay"
+          onClick={() => setIsShareModalOpen(false)}
+          data-testid="share-modal-overlay"
+        >
+          <div className="share-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="share-modal-header">
+              <h3>Share Civic Issue</h3>
+              <button
+                type="button"
+                className="share-modal-close-btn"
+                onClick={() => setIsShareModalOpen(false)}
+                aria-label="Close share dialog"
+              >
+                <FaTimes />
+              </button>
+            </div>
+            <p className="share-modal-subtitle">
+              Help resolve this civic problem by spreading awareness in your community.
+            </p>
+
+            <div className="share-social-grid">
+              <a
+                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                  `Check out this civic issue on Civix: "${issue.title}"\n${window.location.href}`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-share-btn whatsapp"
+              >
+                <FaWhatsapp className="social-icon" />
+                <span>WhatsApp</span>
+              </a>
+
+              <a
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                  `Civic issue reported on @Civix: "${issue.title}"\n${window.location.href}`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-share-btn twitter"
+              >
+                <FaTwitter className="social-icon" />
+                <span>Twitter / X</span>
+              </a>
+
+              <a
+                href={`mailto:?subject=${encodeURIComponent(
+                  `Civic Issue: ${issue.title}`
+                )}&body=${encodeURIComponent(
+                  `Civic issue report:\n\nTitle: ${issue.title}\nDetails: ${issue.description}\nLink: ${window.location.href}`
+                )}`}
+                className="social-share-btn email"
+              >
+                <FaEnvelope className="social-icon" />
+                <span>Email</span>
+              </a>
+            </div>
+
+            <div className="share-link-box">
+              <input
+                type="text"
+                readOnly
+                value={window.location.href}
+                className="share-link-input"
+              />
+              <button
+                type="button"
+                className={`copy-link-btn ${isLinkCopied ? "copied" : ""}`}
+                onClick={handleCopyShareLink}
+              >
+                {isLinkCopied ? (
+                  <>
+                    <FaCheck /> Copied
+                  </>
+                ) : (
+                  <>
+                    <FaCopy /> Copy Link
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
