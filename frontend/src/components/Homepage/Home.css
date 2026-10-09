@@ -525,6 +525,45 @@ body {
   margin-bottom: 0.5rem;
 }
 
+.civix-top-right-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.civix-card-share-btn {
+  background: transparent;
+  border: none;
+  padding: 3px 5px;
+  border-radius: 4px;
+  color: #94a3b8;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  transition: all 0.15s ease;
+}
+
+.civix-card-share-btn:hover {
+  color: #0084ff;
+  background-color: #eff6ff;
+  transform: scale(1.1);
+}
+
+.civix-card-share-btn.copied {
+  color: #10b981;
+  background-color: #ecfdf5;
+}
+
+.copied-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
 .civix-tag-district {
   color: #4f46e5;
   background: #eef2ff;

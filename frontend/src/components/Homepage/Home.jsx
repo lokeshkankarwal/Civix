@@ -13,6 +13,8 @@ import {
   FaSortAmountDown,
   FaThLarge,
   FaList,
+  FaShareAlt,
+  FaCheck,
 } from "react-icons/fa";
 import Navbar from "../Navbar/Navbar";
 import { statesAndDistricts } from "../../utils/statesAndDistricts";
@@ -272,6 +274,25 @@ const Home = () => {
     }
   };
 
+  const [copiedIssueId, setCopiedIssueId] = useState(null);
+
+  const handleQuickShare = (e, issue) => {
+    e.stopPropagation();
+    const shareUrl = `${window.location.origin}/issue/${issue._id}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        setCopiedIssueId(issue._id);
+        setTimeout(() => setCopiedIssueId(null), 2200);
+      }).catch(() => {
+        setCopiedIssueId(issue._id);
+        setTimeout(() => setCopiedIssueId(null), 2200);
+      });
+    } else {
+      setCopiedIssueId(issue._id);
+      setTimeout(() => setCopiedIssueId(null), 2200);
+    }
+  };
+
   const handleIssueClick = (issueId) => {
     navigate(`/issue/${issueId}`);
   };
@@ -506,9 +527,24 @@ const Home = () => {
                         <span className="civix-tag-district">
                           {issue.districtCode || "General"}
                         </span>
-                        <span className="civix-tag-date">
-                          {new Date(issue.createdAt).toLocaleDateString()}
-                        </span>
+                        <div className="civix-top-right-meta">
+                          <span className="civix-tag-date">
+                            {new Date(issue.createdAt).toLocaleDateString()}
+                          </span>
+                          <button
+                            type="button"
+                            className={`civix-card-share-btn ${copiedIssueId === issue._id ? "copied" : ""}`}
+                            onClick={(e) => handleQuickShare(e, issue)}
+                            title={copiedIssueId === issue._id ? "Link copied!" : "Share issue"}
+                            data-testid={`quick-share-${issue._id}`}
+                          >
+                            {copiedIssueId === issue._id ? (
+                              <span className="copied-text"><FaCheck /> Copied</span>
+                            ) : (
+                              <FaShareAlt />
+                            )}
+                          </button>
+                        </div>
                       </div>
 
                       <h3 className="civix-card-title">{issue.title}</h3>
