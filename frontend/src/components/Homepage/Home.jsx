@@ -10,6 +10,8 @@ import {
   FaSearch,
   FaTimes,
   FaSortAmountDown,
+  FaThLarge,
+  FaList,
 } from "react-icons/fa";
 import Navbar from "../Navbar/Navbar";
 import { statesAndDistricts } from "../../utils/statesAndDistricts";
@@ -26,6 +28,13 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
+  const [viewMode, setViewMode] = useState(() => {
+    try {
+      return localStorage.getItem("civix_view_mode") || "grid";
+    } catch {
+      return "grid";
+    }
+  });
   const [selectedState, setSelectedState] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [districtOptions, setDistrictOptions] = useState([]);
@@ -362,34 +371,63 @@ const Home = () => {
                 Showing <strong>{displayedIssues.length}</strong> {displayedIssues.length === 1 ? "issue" : "issues"}
               </span>
 
-              <div className="sort-control">
-                <FaSortAmountDown className="sort-icon" />
-                <label htmlFor="sort-select" className="sort-label">Sort:</label>
-                <select
-                  id="sort-select"
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="interactive-sort-select"
-                  data-testid="sort-select"
-                >
-                  <option value="newest">Newest First</option>
-                  <option value="oldest">Oldest First</option>
-                  <option value="upvotes">Most Upvoted</option>
-                  <option value="comments">Most Discussed</option>
-                </select>
+              <div className="bar-right-controls">
+                <div className="sort-control">
+                  <FaSortAmountDown className="sort-icon" />
+                  <label htmlFor="sort-select" className="sort-label">Sort:</label>
+                  <select
+                    id="sort-select"
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="interactive-sort-select"
+                    data-testid="sort-select"
+                  >
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="upvotes">Most Upvoted</option>
+                    <option value="comments">Most Discussed</option>
+                  </select>
+                </div>
+
+                <div className="view-mode-toggle" role="group" aria-label="View layout">
+                  <button
+                    type="button"
+                    className={`view-toggle-btn ${viewMode === "grid" ? "active" : ""}`}
+                    onClick={() => {
+                      setViewMode("grid");
+                      try { localStorage.setItem("civix_view_mode", "grid"); } catch {}
+                    }}
+                    title="Grid View"
+                    data-testid="grid-view-btn"
+                  >
+                    <FaThLarge />
+                  </button>
+                  <button
+                    type="button"
+                    className={`view-toggle-btn ${viewMode === "list" ? "active" : ""}`}
+                    onClick={() => {
+                      setViewMode("list");
+                      try { localStorage.setItem("civix_view_mode", "list"); } catch {}
+                    }}
+                    title="Compact List View"
+                    data-testid="list-view-btn"
+                  >
+                    <FaList />
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Issues Grid */}
+            {/* Issues Grid / List */}
             {loading ? (
               <IssueCardSkeleton count={8} />
             ) : (
-              <div className="civix-card-layout">
+              <div className={`civix-card-layout ${viewMode === "list" ? "list-view" : ""}`}>
                 {displayedIssues.length > 0 ? (
                 displayedIssues.map((issue) => (
                   <div
                     key={issue._id}
-                    className="civix-item-card"
+                    className={`civix-item-card ${viewMode === "list" ? "list-mode" : ""}`}
                     onClick={() => handleIssueClick(issue._id)}
                   >
                     <div className="civix-card-media">
