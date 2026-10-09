@@ -1,0 +1,83 @@
+.civix-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 48px 24px;
+  background: var(--card-bg, #ffffff);
+  border: 1px dashed var(--border-color, #e2e8f0);
+  border-radius: 16px;
+  margin: 24px 0;
+  transition: all 0.3s ease;
+  animation: fadeInEmpty 0.35s ease-out;
+}
+
+@keyframes fadeInEmpty {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.civix-empty-icon-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(14, 165, 233, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  color: #0284c7;
+  font-size: 1.8rem;
+  transition: transform 0.25s ease;
+}
+
+.civix-empty-state:hover .civix-empty-icon-wrap {
+  transform: scale(1.08) rotate(3deg);
+}
+
+.civix-empty-title {
+  margin: 0 0 8px 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+}
+
+.civix-empty-message {
+  margin: 0 0 20px 0;
+  max-width: 420px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text-secondary, #64748b);
+}
+
+.civix-empty-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #0284c7, #2563eb);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 22px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  transition: all 0.2s ease;
+}
+
+.civix-empty-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+}
+
+.civix-empty-action-btn:active {
+  transform: translateY(0);
+}

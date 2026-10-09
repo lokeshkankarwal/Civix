@@ -20,6 +20,7 @@ import Navbar from "../Navbar/Navbar";
 import { statesAndDistricts } from "../../utils/statesAndDistricts";
 import StatusBadge from "../common/StatusBadge";
 import IssueCardSkeleton from "../common/IssueCardSkeleton";
+import EmptyState from "../common/EmptyState";
 import { normalizeStatus } from "../../utils/formatters";
 
 const Home = () => {
@@ -649,9 +650,28 @@ const Home = () => {
                   </div>
                 ))
               ) : (
-                <div className="civix-empty-state">
-                  <p>No issues found matching your filters.</p>
-                </div>
+                <EmptyState
+                  icon={searchQuery ? "search" : "inbox"}
+                  title="No civic issues found"
+                  message={
+                    searchQuery || statusFilter !== "all"
+                      ? "No issues match your current search query or status filter. Try clearing filters to see all community reports."
+                      : "No civic issues have been reported for this region yet. Be the first to report an issue!"
+                  }
+                  actionLabel={
+                    searchQuery || statusFilter !== "all"
+                      ? "Reset Search & Filters"
+                      : "Report First Issue"
+                  }
+                  onAction={() => {
+                    if (searchQuery || statusFilter !== "all") {
+                      setSearchQuery("");
+                      setStatusFilter("all");
+                    } else {
+                      navigate("/report");
+                    }
+                  }}
+                />
               )}
             </div>
           )}
