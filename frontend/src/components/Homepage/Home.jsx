@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllIssues } from "../../services/api";
+import { getAllIssues, upvoteIssue } from "../../services/api";
 import "./Home.css";
 import {
   FaThumbsUp,
+  FaRegThumbsUp,
   FaCommentDots,
   FaMapMarkerAlt,
   FaImage,
@@ -234,6 +235,42 @@ const Home = () => {
 
     return sorted;
   }, [filteredIssues, searchQuery, statusFilter, sortBy]);
+
+  const currentUser = useMemo(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user") || "{}");
+    } catch {
+      return {};
+    }
+  }, []);
+
+  const handleQuickUpvote = async (e, issueId) => {
+    e.stopPropagation();
+    if (!currentUser?._id) {
+      alert("Please log in to upvote issues.");
+      return;
+    }
+
+    setFilteredIssues((prevIssues) =>
+      prevIssues.map((item) => {
+        if (item._id === issueId) {
+          const upvotes = Array.isArray(item.upvotes) ? item.upvotes : [];
+          const hasUpvoted = upvotes.includes(currentUser._id);
+          const newUpvotes = hasUpvoted
+            ? upvotes.filter((uid) => uid !== currentUser._id)
+            : [...upvotes, currentUser._id];
+          return { ...item, upvotes: newUpvotes };
+        }
+        return item;
+      })
+    );
+
+    try {
+      await upvoteIssue(issueId);
+    } catch (err) {
+      console.error("Failed to upvote:", err);
+    }
+  };
 
   const handleIssueClick = (issueId) => {
     navigate(`/issue/${issueId}`);
@@ -500,10 +537,25 @@ const Home = () => {
                           </strong>
                         </div>
                         <div className="civix-metrics">
-                          <span>
-                            <FaThumbsUp /> {issue.upvotes?.length || 0}
-                          </span>
-                          <span>
+                          <button
+                            type="button"
+                            className={`civix-metric-btn upvote-btn ${
+                              Array.isArray(issue.upvotes) && issue.upvotes.includes(currentUser?._id)
+                                ? "upvoted"
+                                : ""
+                            }`}
+                            onClick={(e) => handleQuickUpvote(e, issue._id)}
+                            title="Upvote issue"
+                            data-testid={`quick-upvote-${issue._id}`}
+                          >
+                            {Array.isArray(issue.upvotes) && issue.upvotes.includes(currentUser?._id) ? (
+                              <FaThumbsUp className="thumb-icon active" />
+                            ) : (
+                              <FaRegThumbsUp className="thumb-icon" />
+                            )}
+                            <span>{issue.upvotes?.length || 0}</span>
+                          </button>
+                          <span className="civix-metric-span" title="Comments">
                             <FaCommentDots /> {issue.comments?.length || 0}
                           </span>
                         </div>

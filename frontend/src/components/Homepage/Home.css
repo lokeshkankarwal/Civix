@@ -607,15 +607,56 @@ body {
 
 .civix-metrics {
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 10px;
 }
 
-.civix-metrics span {
+.civix-metric-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 3px 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+}
+
+.civix-metric-btn:hover {
+  background-color: #eff6ff;
+  color: #0084ff;
+  border-color: #dbeafe;
+  transform: translateY(-1px);
+}
+
+.civix-metric-btn.upvoted {
+  color: #0084ff;
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.civix-metric-btn.upvoted .thumb-icon.active {
+  animation: thumb-pop 0.35s ease;
+}
+
+@keyframes thumb-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.35) rotate(-10deg); }
+  100% { transform: scale(1); }
+}
+
+.civix-metric-span {
   display: flex;
   align-items: center;
   gap: 4px;
   font-weight: 500;
   color: #64748b;
+  font-size: 0.78rem;
 }
 
 /* =========================================
