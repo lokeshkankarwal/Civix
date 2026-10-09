@@ -11,8 +11,11 @@ import {
   FaRegThumbsUp,
   FaChevronLeft,
   FaChevronRight,
+  FaTimes,
+  FaSearchPlus,
 } from "react-icons/fa";
 import Navbar from "../Navbar/Navbar";
+import StatusBadge from "../common/StatusBadge";
 import "./IssueDetails.css";
 
 const IssueDetails = () => {
@@ -23,7 +26,9 @@ const IssueDetails = () => {
   const [loading, setLoading] = useState(true);
   const [hasUpvoted, setHasUpvoted] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const userId = JSON.parse(localStorage.getItem("user"))._id;
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const userId = currentUser?._id;
 
   useEffect(() => {
     const fetchIssue = async () => {
@@ -97,6 +102,18 @@ const IssueDetails = () => {
       prev === issue.images.length - 1 ? 0 : prev + 1
     );
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!isLightboxOpen || !issue?.images?.length) return;
+      if (e.key === "Escape") setIsLightboxOpen(false);
+      if (e.key === "ArrowLeft") handlePrevImage();
+      if (e.key === "ArrowRight") handleNextImage();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isLightboxOpen, issue]);
+
   const handleViewLocation = () => {
     const coords = issue.location?.coordinates;
     if (Array.isArray(coords) && coords.length === 2) {
@@ -107,8 +124,8 @@ const IssueDetails = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (!issue) return <div>Issue not found</div>;
+  if (loading) return <div className="loading-container"><div className="spinner"></div><p>Loading issue details...</p></div>;
+  if (!issue) return <div className="error-container"><p>Issue not found</p></div>;
 
   return (
     <>
@@ -117,9 +134,11 @@ const IssueDetails = () => {
         <div className="issue-main-card">
           <div className="issue-header-row1">
             <div className="status-section1">
-              <div className={`status-badge1 ${issue.status}`}>
-                {issue.status}
-              </div>
+              <StatusBadge
+                status={issue.status}
+                size="md"
+                pulse={issue.status?.toLowerCase().includes("progress")}
+              />
               <button
                 className="view-location-btn"
                 onClick={handleViewLocation}
@@ -136,11 +155,18 @@ const IssueDetails = () => {
           <div className="issue-image-container issue-detail-image">
             {issue.images && issue.images.length > 0 ? (
               <>
-                <div className="issue-image-large">
+                <div
+                  className="issue-image-large clickable"
+                  onClick={() => setIsLightboxOpen(true)}
+                  title="Click to view full image"
+                >
                   <img
                     src={issue.images[currentImageIndex]}
                     alt={issue.title}
                   />
+                  <div className="image-zoom-hint">
+                    <FaSearchPlus /> Click to enlarge
+                  </div>
                   {issue.images.length > 1 && (
                     <>
                       <button
@@ -290,6 +316,54 @@ const IssueDetails = () => {
           </form>
         </div>
       </div>
+
+      {/* Interactive Image Lightbox Modal */}
+      {isLightboxOpen && issue.images && issue.images.length > 0 && (
+        <div
+          className="lightbox-overlay"
+          onClick={() => setIsLightboxOpen(false)}
+          data-testid="lightbox-overlay"
+        >
+          <div className="lightbox-modal" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className="lightbox-close-btn"
+              onClick={() => setIsLightboxOpen(false)}
+              aria-label="Close lightbox"
+            >
+              <FaTimes />
+            </button>
+            <img
+              src={issue.images[currentImageIndex]}
+              alt={issue.title}
+              className="lightbox-img"
+            />
+            {issue.images.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  className="lightbox-nav-btn prev"
+                  onClick={handlePrevImage}
+                  aria-label="Previous image"
+                >
+                  <FaChevronLeft />
+                </button>
+                <button
+                  type="button"
+                  className="lightbox-nav-btn next"
+                  onClick={handleNextImage}
+                  aria-label="Next image"
+                >
+                  <FaChevronRight />
+                </button>
+                <div className="lightbox-counter">
+                  {currentImageIndex + 1} / {issue.images.length}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 };
