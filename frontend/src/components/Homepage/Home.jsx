@@ -23,6 +23,7 @@ const Home = () => {
 
   const [filteredIssues, setFilteredIssues] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [selectedState, setSelectedState] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [districtOptions, setDistrictOptions] = useState([]);
@@ -148,24 +149,66 @@ const Home = () => {
     fetchIssues(selectedState, selectedDistrict, 1);
   };
 
-  const displayedIssues = useMemo(() => {
-    if (!searchQuery.trim()) return filteredIssues;
-    const q = searchQuery.toLowerCase().trim();
-    return filteredIssues.filter((issue) => {
-      const title = (issue.title || "").toLowerCase();
-      const desc = (issue.description || "").toLowerCase();
-      const addr = (issue.location?.address || "").toLowerCase();
-      const author = (issue.createdBy?.username || "").toLowerCase();
-      const district = (issue.districtCode || "").toLowerCase();
-      return (
-        title.includes(q) ||
-        desc.includes(q) ||
-        addr.includes(q) ||
-        author.includes(q) ||
-        district.includes(q)
-      );
+  const STATUS_TABS = [
+    { key: "all", label: "All Issues" },
+    { key: "unsolved", label: "Unsolved" },
+    { key: "in_progress", label: "In Progress" },
+    { key: "solved", label: "Solved" },
+    { key: "re-reported", label: "Re-reported" },
+  ];
+
+  const statusCounts = useMemo(() => {
+    const counts = { all: filteredIssues.length, unsolved: 0, in_progress: 0, solved: 0, "re-reported": 0 };
+    filteredIssues.forEach((issue) => {
+      const norm = normalizeStatus(issue.status);
+      if (norm === "solved" || norm === "resolved") {
+        counts.solved += 1;
+      } else if (norm === "in_progress") {
+        counts.in_progress += 1;
+      } else if (norm === "re-reported" || norm === "re_reported") {
+        counts["re-reported"] += 1;
+      } else {
+        counts.unsolved += 1;
+      }
     });
-  }, [filteredIssues, searchQuery]);
+    return counts;
+  }, [filteredIssues]);
+
+  const displayedIssues = useMemo(() => {
+    let result = filteredIssues;
+
+    // Filter by status tab
+    if (statusFilter !== "all") {
+      result = result.filter((issue) => {
+        const norm = normalizeStatus(issue.status);
+        if (statusFilter === "solved") return norm === "solved" || norm === "resolved";
+        if (statusFilter === "in_progress") return norm === "in_progress";
+        if (statusFilter === "re-reported") return norm === "re-reported" || norm === "re_reported";
+        return norm === "unsolved" || norm === "pending" || norm === "reported";
+      });
+    }
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter((issue) => {
+        const title = (issue.title || "").toLowerCase();
+        const desc = (issue.description || "").toLowerCase();
+        const addr = (issue.location?.address || "").toLowerCase();
+        const author = (issue.createdBy?.username || "").toLowerCase();
+        const district = (issue.districtCode || "").toLowerCase();
+        return (
+          title.includes(q) ||
+          desc.includes(q) ||
+          addr.includes(q) ||
+          author.includes(q) ||
+          district.includes(q)
+        );
+      });
+    }
+
+    return result;
+  }, [filteredIssues, searchQuery, statusFilter]);
 
   const handleIssueClick = (issueId) => {
     navigate(`/issue/${issueId}`);
@@ -275,6 +318,26 @@ const Home = () => {
                   Showing <strong>{displayedIssues.length}</strong> {displayedIssues.length === 1 ? "result" : "results"} for "{searchQuery}"
                 </div>
               )}
+            </div>
+
+            {/* Interactive Status Tabs */}
+            <div className="status-tabs-container">
+              {STATUS_TABS.map((tab) => {
+                const count = statusCounts[tab.key] || 0;
+                const isActive = statusFilter === tab.key;
+                return (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    className={`status-tab-btn ${isActive ? "active" : ""}`}
+                    onClick={() => setStatusFilter(tab.key)}
+                    data-testid={`status-tab-${tab.key}`}
+                  >
+                    <span>{tab.label}</span>
+                    <span className="status-tab-count">{count}</span>
+                  </button>
+                );
+              })}
             </div>
 
             {/* Issues Grid */}
