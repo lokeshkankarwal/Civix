@@ -9,6 +9,7 @@ import {
   FaImage,
   FaSearch,
   FaTimes,
+  FaSortAmountDown,
 } from "react-icons/fa";
 import Navbar from "../Navbar/Navbar";
 import { statesAndDistricts } from "../../utils/statesAndDistricts";
@@ -24,6 +25,7 @@ const Home = () => {
   const [filteredIssues, setFilteredIssues] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("newest");
   const [selectedState, setSelectedState] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [districtOptions, setDistrictOptions] = useState([]);
@@ -207,8 +209,22 @@ const Home = () => {
       });
     }
 
-    return result;
-  }, [filteredIssues, searchQuery, statusFilter]);
+    // Sort issues
+    const sorted = [...result].sort((a, b) => {
+      if (sortBy === "oldest") {
+        return new Date(a.createdAt) - new Date(b.createdAt);
+      }
+      if (sortBy === "upvotes") {
+        return (b.upvotes?.length || 0) - (a.upvotes?.length || 0);
+      }
+      if (sortBy === "comments") {
+        return (b.comments?.length || 0) - (a.comments?.length || 0);
+      }
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+
+    return sorted;
+  }, [filteredIssues, searchQuery, statusFilter, sortBy]);
 
   const handleIssueClick = (issueId) => {
     navigate(`/issue/${issueId}`);
@@ -338,6 +354,30 @@ const Home = () => {
                   </button>
                 );
               })}
+            </div>
+
+            {/* Sort & Results Bar */}
+            <div className="filter-actions-bar">
+              <span className="results-counter">
+                Showing <strong>{displayedIssues.length}</strong> {displayedIssues.length === 1 ? "issue" : "issues"}
+              </span>
+
+              <div className="sort-control">
+                <FaSortAmountDown className="sort-icon" />
+                <label htmlFor="sort-select" className="sort-label">Sort:</label>
+                <select
+                  id="sort-select"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="interactive-sort-select"
+                  data-testid="sort-select"
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                  <option value="upvotes">Most Upvoted</option>
+                  <option value="comments">Most Discussed</option>
+                </select>
+              </div>
             </div>
 
             {/* Issues Grid */}
