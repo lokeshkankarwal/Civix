@@ -113,9 +113,10 @@
   gap: 1rem;
 }
 
-/* Shared styles for Bell and User buttons */
+/* Shared styles for Bell, Theme and User buttons */
 .notification-button,
-.profile-button {
+.profile-button,
+.theme-toggle-btn {
   background: white;
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
@@ -131,15 +132,25 @@
 }
 
 .notification-button:hover,
-.profile-button:hover {
+.profile-button:hover,
+.theme-toggle-btn:hover {
   border-color: var(--primary-color);
   color: var(--primary-color);
   transform: translateY(-2px);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
+.theme-sun {
+  color: #f59e0b;
+}
+
+.theme-moon {
+  color: #6366f1;
+}
+
 .notification-button:active,
-.profile-button:active {
+.profile-button:active,
+.theme-toggle-btn:active {
   transform: translateY(0);
 }
 
@@ -338,4 +349,74 @@
     width: 36px;
     height: 36px;
   }
+}
+
+/* =========================================
+   Dark Theme Overrides
+========================================= */
+[data-theme="dark"] {
+  --bg-page: #0f172a;
+  --bg-card: #1e293b;
+  --nav-bg: rgba(15, 23, 42, 0.9);
+  --text-primary: #f8fafc;
+  --text-main: #f8fafc;
+  --text-secondary: #94a3b8;
+  --border-color: #334155;
+}
+
+[data-theme="dark"] body {
+  background-color: #0f172a;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .navbar {
+  background-color: var(--nav-bg);
+  border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .notification-button,
+[data-theme="dark"] .profile-button,
+[data-theme="dark"] .theme-toggle-btn,
+[data-theme="dark"] .profile-dropdown-menu,
+[data-theme="dark"] .mobile-hamburger-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .profile-dropdown-menu {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .dropdown-item {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+  background: #334155;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .nav-links.mobile-open {
+  background: #1e293b;
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .civix-item-card,
+[data-theme="dark"] .filters-bar,
+[data-theme="dark"] .filter-select,
+[data-theme="dark"] .interactive-search-field,
+[data-theme="dark"] .interactive-sort-select,
+[data-theme="dark"] .status-tab-btn,
+[data-theme="dark"] .stepper-card,
+[data-theme="dark"] .share-modal-card {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .civix-card-title,
+[data-theme="dark"] .user-name {
+  color: #f8fafc;
 }

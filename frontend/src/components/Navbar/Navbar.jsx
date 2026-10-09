@@ -10,6 +10,8 @@ import {
   FaTimes,
   FaSignOutAlt,
   FaIdBadge,
+  FaMoon,
+  FaSun,
 } from "react-icons/fa";
 import "./Navbar.css";
 
@@ -18,7 +20,25 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [theme, setTheme] = useState(() => {
+    try {
+      return localStorage.getItem("civix_theme") || "light";
+    } catch {
+      return "light";
+    }
+  });
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    try {
+      localStorage.setItem("civix_theme", theme);
+    } catch {}
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  };
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -104,6 +124,18 @@ const Navbar = () => {
 
         {/* User profile & interactive actions */}
         <div className="user-profile">
+          {/* Theme Toggle Button */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="theme-toggle-btn"
+            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            aria-label="Toggle theme"
+            data-testid="theme-toggle-btn"
+          >
+            {theme === "dark" ? <FaSun className="theme-sun" /> : <FaMoon className="theme-moon" />}
+          </button>
+
           {/* Notification Button */}
           <button
             type="button"
