@@ -54,6 +54,18 @@ const IssueDetails = () => {
     }
   }, [issue, userId]);
 
+  const QUICK_REACTIONS = [
+    "👍 Validated",
+    "⚠️ Urgent attention needed",
+    "🙏 Please expedite",
+    "📍 Still an issue",
+    "👏 Great progress",
+  ];
+
+  const handleAddReaction = (reaction) => {
+    setComment((prev) => (prev ? `${prev} ${reaction}` : reaction));
+  };
+
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
 
@@ -300,21 +312,50 @@ const IssueDetails = () => {
             )}
           </div>
           <form className="comment-form" onSubmit={handleCommentSubmit}>
+            <div className="quick-reactions-bar">
+              <span className="quick-reactions-label">Quick observations:</span>
+              <div className="quick-reactions-chips">
+                {QUICK_REACTIONS.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    className="reaction-chip-btn"
+                    onClick={() => handleAddReaction(tag)}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Add a comment..."
+              onKeyDown={(e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+                  handleCommentSubmit(e);
+                }
+              }}
+              placeholder="Add a comment... (Ctrl+Enter to post)"
               required
               rows={3}
+              maxLength={500}
             />
-            <button type="submit">
-              <span style={{ marginRight: 6, display: "inline-block" }}>
-                <svg width="18" height="18" fill="currentColor">
-                  <path d="M2 16l14-7L2 2v5l10 2-10 2z" />
-                </svg>
+
+            <div className="comment-form-footer">
+              <span className={`char-counter ${comment.length > 450 ? "near-limit" : ""}`}>
+                {comment.length} / 500 characters
               </span>
-              Post Comment
-            </button>
+
+              <button type="submit" disabled={!comment.trim()}>
+                <span style={{ marginRight: 6, display: "inline-block" }}>
+                  <svg width="18" height="18" fill="currentColor">
+                    <path d="M2 16l14-7L2 2v5l10 2-10 2z" />
+                  </svg>
+                </span>
+                Post Comment
+              </button>
+            </div>
           </form>
         </div>
       </div>
