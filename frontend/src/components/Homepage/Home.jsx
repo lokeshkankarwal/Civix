@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAllIssues } from "../../services/api";
 import "./Home.css";
@@ -7,6 +7,8 @@ import {
   FaCommentDots,
   FaMapMarkerAlt,
   FaImage,
+  FaSearch,
+  FaTimes,
 } from "react-icons/fa";
 import Navbar from "../Navbar/Navbar";
 import { statesAndDistricts } from "../../utils/statesAndDistricts";
@@ -20,6 +22,7 @@ const Home = () => {
   const [error, setError] = useState(null);
 
   const [filteredIssues, setFilteredIssues] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedState, setSelectedState] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [districtOptions, setDistrictOptions] = useState([]);
@@ -145,6 +148,25 @@ const Home = () => {
     fetchIssues(selectedState, selectedDistrict, 1);
   };
 
+  const displayedIssues = useMemo(() => {
+    if (!searchQuery.trim()) return filteredIssues;
+    const q = searchQuery.toLowerCase().trim();
+    return filteredIssues.filter((issue) => {
+      const title = (issue.title || "").toLowerCase();
+      const desc = (issue.description || "").toLowerCase();
+      const addr = (issue.location?.address || "").toLowerCase();
+      const author = (issue.createdBy?.username || "").toLowerCase();
+      const district = (issue.districtCode || "").toLowerCase();
+      return (
+        title.includes(q) ||
+        desc.includes(q) ||
+        addr.includes(q) ||
+        author.includes(q) ||
+        district.includes(q)
+      );
+    });
+  }, [filteredIssues, searchQuery]);
+
   const handleIssueClick = (issueId) => {
     navigate(`/issue/${issueId}`);
   };
@@ -177,16 +199,41 @@ const Home = () => {
             </div>
           </div>
 
-            {/* Location Search */}
+            {/* Location Search & Real-Time Filter */}
             <div className="filters-bar">
-              <div className="search-wrapper" style={{ minWidth: "100%" }}>
-                <h4 style={{ marginBottom: "10px", color: "#1f2937" }}>
-                  Search issues at your location
-                </h4>
-                {detectingLocation && (
-                  <p style={{ marginBottom: "10px", color: "#6b7280" }}>
-                    Detecting your location...
-                  </p>
+              <div className="search-top-header">
+                <div>
+                  <h4 style={{ margin: "0 0 4px 0", color: "#1f2937", fontSize: "1.1rem", fontWeight: "700" }}>
+                    Search issues at your location
+                  </h4>
+                  {detectingLocation && (
+                    <p style={{ margin: "0 0 6px 0", color: "#6b7280", fontSize: "0.85rem" }}>
+                      Detecting your location...
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Real-time search query box */}
+              <div className="interactive-search-bar">
+                <FaSearch className="search-bar-icon" />
+                <input
+                  type="text"
+                  placeholder="Search issues by title, description or location..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="interactive-search-field"
+                  data-testid="search-issues-input"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    className="clear-search-btn"
+                    onClick={() => setSearchQuery("")}
+                    aria-label="Clear search"
+                  >
+                    <FaTimes />
+                  </button>
                 )}
               </div>
 
@@ -222,6 +269,12 @@ const Home = () => {
                   Search
                 </button>
               </div>
+
+              {searchQuery && (
+                <div className="search-active-pill">
+                  Showing <strong>{displayedIssues.length}</strong> {displayedIssues.length === 1 ? "result" : "results"} for "{searchQuery}"
+                </div>
+              )}
             </div>
 
             {/* Issues Grid */}
@@ -229,8 +282,8 @@ const Home = () => {
               <IssueCardSkeleton count={8} />
             ) : (
               <div className="civix-card-layout">
-                {filteredIssues.length > 0 ? (
-                filteredIssues.map((issue) => (
+                {displayedIssues.length > 0 ? (
+                displayedIssues.map((issue) => (
                   <div
                     key={issue._id}
                     className="civix-item-card"
